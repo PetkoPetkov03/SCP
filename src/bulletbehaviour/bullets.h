@@ -4,23 +4,46 @@ class Bullet
 {
 
 public:
-    Bullet(Vector2 WindowScale, Vector2 PlayerPosition, float BulletSpeed, KeyboardKey key)
+    Bullet(Vector2 WindowScale, Vector2 PlayerPosition, float BulletSpeed, int frames, KeyboardKey key, Player *player)
     {
-        if (key == KEY_UP)
+
+        if (player->CanShoot())
         {
-            direction.up = true;
-        }
-        else if (key == KEY_DOWN)
-        {
-            direction.down = true;
-        }
-        else if (key == KEY_LEFT)
-        {
-            direction.left = true;
-        }
-        else if (key == KEY_RIGHT)
-        {
-            direction.right = true;
+            fired = true;
+            if (key == KEY_UP)
+            {
+                direction.up = true;
+                direction.down = false;
+                direction.left = false;
+                direction.right = false;
+                player->Shoot();
+            }
+            if (key == KEY_DOWN)
+            {
+                direction.down = true;
+                direction.up = false;
+                direction.left = false;
+                direction.right = false;
+                player->Shoot();
+            }
+            if (key == KEY_LEFT)
+            {
+                direction.left = true;
+                direction.down = false;
+                direction.up = false;
+                direction.right = false;
+                player->Shoot();
+            }
+            if (key == KEY_RIGHT)
+            {
+                direction.right = true;
+                direction.down = false;
+                direction.left = false;
+                direction.up = false;
+                player->Shoot();
+            }
+        }else{
+            fired = false;
         }
 
         speed = BulletSpeed;
@@ -28,9 +51,19 @@ public:
         position.y = PlayerPosition.y;
     }
 
+    Vector2 GetPosition() {
+        return position;
+    }
+
     void Draw(Vector2 WindowScale)
     {
-        return DrawCircleV(position, (WindowScale.x / WindowScale.y) * 1.2, MAROON);
+        if(ShouldDraw()) {
+            return DrawCircleV(position, (WindowScale.x / WindowScale.y) * 1.2, MAROON);
+        }
+    }
+
+    bool ShouldDraw() {
+        return fired;
     }
 
     void MoveAuto(Vector2 WindowScale)
@@ -53,10 +86,15 @@ public:
         }
     }
 
+    Bullet* GetSelf() {
+        return self;
+    }
+
 private:
     float speed;
     float damage;
     Vector2 position;
+    bool fired;
     struct direction
     {
         bool up;
@@ -64,4 +102,6 @@ private:
         bool left;
         bool right;
     } direction;
+
+    Bullet* self;
 };
